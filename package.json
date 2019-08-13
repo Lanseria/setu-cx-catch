@@ -1,0 +1,40 @@
+{
+  "name": "setu-cx-catch",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "serve": "ts-node src/app.ts",
+    "script": "ts-node src/script.ts",
+    "start": "nodemon"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@gitlab.com/Lanseria/setu-cx-catch.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://gitlab.com/Lanseria/setu-cx-catch/issues"
+  },
+  "homepage": "https://gitlab.com/Lanseria/setu-cx-catch#readme",
+  "devDependencies": {
+    "@types/crypto-js": "^3.1.43",
+    "@types/got": "^9.6.6",
+    "@types/moment": "^2.13.0",
+    "@types/node": "^12.7.1",
+    "eslint": "^6.1.0",
+    "nodemon": "^1.19.1",
+    "pg": "^7.12.1",
+    "ts-node": "^8.3.0",
+    "typeorm": "^0.2.18",
+    "typescript": "^3.5.3"
+  },
+  "dependencies": {
+    "crypto-js": "^3.1.9-1",
+    "got": "^9.6.0",
+    "moment": "^2.24.0"
+  }
+}
