@@ -4,8 +4,8 @@ import { promisify } from "util";
 import * as fs from "fs";
 import { OutgoingHttpHeaders } from "http";
 import { genAuthsign } from "./script";
+
 const pipeline = promisify(stream.pipeline);
-const writerStream = fs.createWriteStream(`imgs/${new Date().getTime()}.json`);
 const headers: OutgoingHttpHeaders = {
   DNT: "1",
   "Sec-Fetch-Site": "same-site",
@@ -23,10 +23,13 @@ const gotDownload = async (url: string, idx: number, dirTitle: string) => {
   try {
     await pipeline(
       got.stream(url),
-      (wstream = fs.createWriteStream(`imgs/${dirTitle}/${idx}.webp`))
+      (wstream = fs.createWriteStream(`imgs/${dirTitle}/${idx}.png`))
     );
+    wstream.end();
+    return true;
   } catch (error) {
     console.log(error);
+    return false;
   }
 };
 
@@ -47,6 +50,7 @@ const gotPageImgs = async (_id: string) => {
     data: ResponseData;
   }
   try {
+    let finishCount = 0;
     headers["Authsign"] = genAuthsign(`/album/${_id}`);
     const response = await got(`https://api.setu.cx/album/${_id}`, {
       headers: headers,
@@ -54,19 +58,21 @@ const gotPageImgs = async (_id: string) => {
     });
     const responseData: ResponseBody = response.body;
     fs.mkdirSync(`imgs/${responseData.data.title}/`);
+
+    const writerStream = fs.createWriteStream(
+      `imgs/${responseData.data.title}/${responseData.data.title}.json`
+    );
+    writerStream.write(JSON.stringify(responseData), "UTF8");
+    writerStream.end();
     const { files } = responseData.data;
     for (const [i, file] of files.entries()) {
       gotDownload(file, i, responseData.data.title);
     }
-    wstream.end();
-    // responseData.data.files.forEach(async (m, i) => {
-    //   gotDownload(m, i, responseData.data.title);
-    // });
   } catch (error) {
+    console.log(_id);
     console.log(error.response.body);
   }
 };
-
 (async () => {
   try {
     interface ResponseData {
@@ -84,15 +90,6 @@ const gotPageImgs = async (_id: string) => {
       data: ResponseData[];
     }
 
-    // headers["Authsign"] = genAuthsign(`/album`);
-    // const response = await got("https://api.setu.cx/album?page=1", {
-    //   headers: headers,
-    //   json: true
-    // });
-    // const responseData: ResponseBody = response.body;
-    // writerStream.write(JSON.stringify(responseData), "UTF8");
-    // writerStream.end();
-
     const path = "imgs/";
     const pa = fs.readdirSync(path);
     const existDirs: string[] = [];
@@ -104,15 +101,16 @@ const gotPageImgs = async (_id: string) => {
       }
     });
 
-    const data = fs.readFileSync("imgs/1565703207988.json", "utf8");
+    const data = fs.readFileSync("imgs/1567910098814.json", "utf8");
     const responseData: ResponseBody = JSON.parse(data);
     responseData.data.forEach(async m => {
       if (!existDirs.includes(m.title)) {
         await gotPageImgs(m._id);
       }
     });
+    console.log("waiting");
   } catch (error) {
-    console.log(error.response.body);
+    console.log(error);
     //=> 'Internal server error ...'
   }
 })();

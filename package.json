@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
+    "get": "ts-node src/getJson.ts",
     "serve": "ts-node src/app.ts",
     "script": "ts-node src/script.ts",
     "start": "nodemon"
